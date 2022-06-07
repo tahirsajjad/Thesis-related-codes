@@ -1,0 +1,70 @@
+clc;
+clear all;
+I=imread('CT.jpg');
+R=I(:)';
+x(1) = 0.5748;
+r= 3.78;
+    for i = 2:65536, % iterate
+    if ((x(i-1))<0.5)
+x(i)= mod(((   (  ((r^2)/2) * (x(i-1)) * (1-((r/2)*(x(i-1)))))   +  ((r/2)*(x(i-1)))  ) * (r^14)), 1);
+    elseif (ge(x(i-1),0.5))
+    x(i)= mod((( ( ((r^2)/2)*(1-(x(i-1)))* (1-((r/2)*(1-(x(i-1))))) ) + (  (r/2)*(1-(x(i-1))))  ) * (r^14)), 1);    
+end
+end
+H=sort(x);
+[H,T]=sort(x);
+P=R(T);  
+K = reshape(P, 256, 256)
+format long
+a=1.4; 
+b=0.3;
+x(1)=0.766;
+y(1)=0.3;
+for n=2:65536;
+x(n)= 1-a*((x(n-1))^2) + y(n-1);
+y(n) = b*x(n-1);
+end
+m1 = min(x);
+n1 = max(x);
+o1 = n1 - m1;
+x1 = uint8(255*((x-m1)/o1));
+x2 = reshape(x1, 256, 256);   
+m2 = min(y);
+n2 = max(y);
+o2 = n2 - m2;
+y1 = uint8(255*((y-m2)/o2));
+y2 = reshape(y1, 256, 256);  
+vo=140;
+C=bitxor(K,x2)
+m=256;
+n=256;
+s=1;
+for i=1:m
+for j=1:n
+if (i==1 && j==1)
+D(i,j)=bitxor(vo,(C(i,j)));
+elseif (ge(i,2) && j==1)
+D(i,j)=bitxor((C(i,j)),(K(i-1,n)));
+else
+D(i,j)=bitxor((D(i,j-1)),(C(i,j)));
+end
+end
+end
+D1 = reshape(D, 256, 256);
+E=bitxor(y2,D1);
+m=256
+n=256
+wo=190
+s=1
+for i=m:-1:1
+for j=n:-1:1
+if (i==m && j==n)
+F(i,j)=bitxor((E(i,j)),wo);
+elseif (i==m && le(j,n-1))
+F(i,j)=bitxor((E(i,j)),(D(s,j+1)));
+else
+F(i,j)=bitxor((E(i,j)),(F(i+1,j)));
+end
+end
+end
+imshow(F);

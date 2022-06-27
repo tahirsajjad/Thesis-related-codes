@@ -31,7 +31,7 @@ vg=v2+1;
 vs2=sbox(vg);
 vb=v3+1;
 vs3=sbox(vb);
-format long
+format long E;
 u1=4.5;
 L=85536;
 x(1)=0.479;
